@@ -44,6 +44,16 @@ body{
     line-height:1.6;
 }
 
+#userName{
+    width:100%;
+    max-width:400px;
+    padding:12px;
+    margin-top:15px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    font-size:16px;
+}
+
 #startBtn{
     margin-top:20px;
     padding:15px 35px;
@@ -144,6 +154,14 @@ body{
             will be shown after completing the assessment.
         </p>
 
+        <input
+            type="text"
+            id="userName"
+            placeholder="Enter your full name"
+        >
+
+        <br>
+
         <button id="startBtn" onclick="startExam()">
             Start Assessment
         </button>
@@ -159,7 +177,9 @@ body{
 
         <div id="answers"></div>
 
-        <button id="nextBtn" disabled>Next Question</button>
+        <button id="nextBtn" disabled>
+            Next Question
+        </button>
 
     </div>
 
@@ -167,6 +187,8 @@ body{
     <div id="resultSection" style="display:none;">
 
         <h2>Assessment Complete ✅</h2>
+
+        <h3 id="candidateName"></h3>
 
         <h3 id="score"></h3>
 
@@ -310,6 +332,7 @@ let currentQuestion = 0;
 let score = 0;
 let selectedAnswer = "";
 let wrongAnswers = [];
+let userName = "";
 
 const questionEl = document.getElementById("question");
 const answersEl = document.getElementById("answers");
@@ -317,6 +340,13 @@ const progressEl = document.getElementById("progress");
 const nextBtn = document.getElementById("nextBtn");
 
 function startExam(){
+
+    userName = document.getElementById("userName").value.trim();
+
+    if(userName === ""){
+        alert("Please enter your name before starting.");
+        return;
+    }
 
     document.getElementById("startScreen").style.display = "none";
     document.getElementById("quizSection").style.display = "block";
@@ -357,6 +387,7 @@ function loadQuestion(){
         };
 
         answersEl.appendChild(btn);
+
     });
 
 }
@@ -366,13 +397,17 @@ nextBtn.addEventListener("click", () => {
     const q = questions[currentQuestion];
 
     if(selectedAnswer === q.answer){
+
         score++;
+
     }else{
+
         wrongAnswers.push({
             question:q.question,
             selected:selectedAnswer,
             correct:q.answer
         });
+
     }
 
     currentQuestion++;
@@ -386,6 +421,7 @@ nextBtn.addEventListener("click", () => {
     }else{
 
         showResults();
+
     }
 
 });
@@ -398,6 +434,9 @@ function showResults(){
 
     const percentage =
     Math.round((score / questions.length) * 100);
+
+    document.getElementById("candidateName").innerHTML =
+    `Participant: <strong>${userName}</strong>`;
 
     document.getElementById("score").innerHTML =
     `Score: ${score} / ${questions.length} (${percentage}%)`;
@@ -417,6 +456,7 @@ function showResults(){
                     <p class="correct">Correct Answer: ${item.correct}</p>
                 </div>
             `;
+
         });
 
     }else{
@@ -426,6 +466,7 @@ function showResults(){
     }
 
     document.getElementById("reviewArea").innerHTML = html;
+
 }
 
 </script>
