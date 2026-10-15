@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NCD Learning Assessment</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+    background:linear-gradient(135deg,#003366,#005a9e);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.container{
+    width:100%;
+    max-width:850px;
+    background:white;
+    border-radius:15px;
+    padding:40px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.25);
+}
+
+#startScreen{
+    text-align:center;
+}
+
+#startScreen h1{
+    color:#003366;
+    margin-bottom:10px;
+}
+
+#startScreen p{
+    color:#555;
+    line-height:1.6;
+}
+
+#startBtn{
+    margin-top:20px;
+    padding:15px 35px;
+    font-size:18px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    background:#0078d7;
+    color:white;
+}
+
+#startBtn:hover{
+    background:#005ea6;
+}
+
+#progress{
+    font-weight:bold;
+    color:#666;
+    margin-bottom:15px;
+}
+
+.option{
+    display:block;
+    width:100%;
+    margin:10px 0;
+    padding:15px;
+    border:none;
+    border-radius:10px;
+    text-align:left;
+    cursor:pointer;
+    background:#f0f0f0;
+    font-size:15px;
+    transition:0.2s;
+}
+
+.option:hover{
+    background:#dbe9ff;
+}
+
+.selected{
+    background:#0078d7 !important;
+    color:white;
+}
+
+#nextBtn{
+    margin-top:20px;
+    padding:12px 30px;
+    border:none;
+    border-radius:8px;
+    background:#0078d7;
+    color:white;
+    cursor:pointer;
+}
+
+#nextBtn:disabled{
+    opacity:0.5;
+    cursor:not-allowed;
+}
+
+.review-item{
+    border:1px solid #ddd;
+    border-radius:8px;
+    padding:15px;
+    margin-bottom:15px;
+}
+
+.correct{
+    color:green;
+    font-weight:bold;
+}
+
+.wrong{
+    color:red;
+    font-weight:bold;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+    <!-- START SCREEN -->
+    <div id="startScreen">
+
+        <h1>NCD Learning Assessment</h1>
+
+        <p>
+            Welcome to the Network & Communications Department Learning Assessment.
+        </p>
+
+        <p>
+            This examination contains <strong>20 multiple-choice questions</strong>.
+        </p>
+
+        <p>
+            Questions will be presented one at a time. Your score and corrections
+            will be shown after completing the assessment.
+        </p>
+
+        <button id="startBtn" onclick="startExam()">
+            Start Assessment
+        </button>
+
+    </div>
+
+    <!-- QUIZ -->
+    <div id="quizSection" style="display:none;">
+
+        <div id="progress"></div>
+
+        <h2 id="question"></h2>
+
+        <div id="answers"></div>
+
+        <button id="nextBtn" disabled>Next Question</button>
+
+    </div>
+
+    <!-- RESULT -->
+    <div id="resultSection" style="display:none;">
+
+        <h2>Assessment Complete ✅</h2>
+
+        <h3 id="score"></h3>
+
+        <div id="reviewArea"></div>
+
+        <button onclick="location.reload()">
+            Take Assessment Again
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+const questions = [
+
+{
+question:"What does LAN stand for?",
+options:["Local Area Network","Large Access Network","Link Area Node","Local Admin Network"],
+answer:"Local Area Network"
+},
+
+{
+question:"What does WAN stand for?",
+options:["Wide Area Network","Wireless Access Node","Web Application Network","World Area Node"],
+answer:"Wide Area Network"
+},
+
+{
+question:"Which section handles VLAN configurations?",
+options:["CMS","NMS","NOSS","HR"],
+answer:"NMS"
+},
+
+{
+question:"What tool is used to test cable continuity?",
+options:["LAN Tester","AnyDesk","FortiClient","MyPCInfo"],
+answer:"LAN Tester"
+},
+
+{
+question:"How many pins does an RJ45 connector have?",
+options:["4","6","8","10"],
+answer:"8"
+},
+
+{
+question:"Which command displays detailed IP settings?",
+options:["ping","getmac","ipconfig /all","tracert"],
+answer:"ipconfig /all"
+},
+
+{
+question:"What IP range is commonly used for wired LAN?",
+options:["127.x.x.x","10.x.x.x","169.254.x.x","8.8.8.8"],
+answer:"10.x.x.x"
+},
+
+{
+question:"What does AP stand for?",
+options:["Access Point","Application Port","Access Protocol","Advanced Proxy"],
+answer:"Access Point"
+},
+
+{
+question:"Which cable type uses the same standard on both ends?",
+options:["Crossover","Straight-through","Fiber","Console"],
+answer:"Straight-through"
+},
+
+{
+question:"What is usually the first troubleshooting step?",
+options:["Replace hardware","Escalate ticket","Probe the client","Restart switch"],
+answer:"Probe the client"
+},
+
+{
+question:"'No Ethernet Link' usually indicates what?",
+options:["Physical connection issue","DNS issue","VLAN issue","Proxy issue"],
+answer:"Physical connection issue"
+},
+
+{
+question:"Which tool is used to attach RJ45 connectors?",
+options:["Tone Tracer","LAN Tester","Crimping Tool","AnyDesk"],
+answer:"Crimping Tool"
+},
+
+{
+question:"APIPA addresses begin with?",
+options:["10.","127.","192.","169.254"],
+answer:"169.254"
+},
+
+{
+question:"Which section coordinates with telecom providers and ISPs?",
+options:["NOSS","NMS","CMS","Audit"],
+answer:"CMS"
+},
+
+{
+question:"Which command continuously pings a device?",
+options:["ping -t","ping /all","ipconfig","renew"],
+answer:"ping -t"
+},
+
+{
+question:"Which VLAN is commonly used for IP Phones on Ground to 3rd Floor?",
+options:["30","31","32","34"],
+answer:"32"
+},
+
+{
+question:"What is 127.0.0.1?",
+options:["Gateway","Loopback Address","Proxy Server","DHCP Server"],
+answer:"Loopback Address"
+},
+
+{
+question:"Which application is used for VPN access?",
+options:["Chrome","AnyDesk","FortiClient","MyPCInfo"],
+answer:"FortiClient"
+},
+
+{
+question:"On Alcatel switches, what LED color usually means PC + IP Phone?",
+options:["Red","Blue","Green","Amber"],
+answer:"Amber"
+},
+
+{
+question:"Approximately how many SSS locations are supported?",
+options:["100+","150+","234+","500+"],
+answer:"234+"
+}
+
+];
+
+let currentQuestion = 0;
+let score = 0;
+let selectedAnswer = "";
+let wrongAnswers = [];
+
+const questionEl = document.getElementById("question");
+const answersEl = document.getElementById("answers");
+const progressEl = document.getElementById("progress");
+const nextBtn = document.getElementById("nextBtn");
+
+function startExam(){
+
+    document.getElementById("startScreen").style.display = "none";
+    document.getElementById("quizSection").style.display = "block";
+
+    loadQuestion();
+}
+
+function loadQuestion(){
+
+    const q = questions[currentQuestion];
+
+    progressEl.textContent =
+    `Question ${currentQuestion + 1} of ${questions.length}`;
+
+    questionEl.textContent = q.question;
+
+    answersEl.innerHTML = "";
+
+    selectedAnswer = "";
+
+    q.options.forEach(option => {
+
+        const btn = document.createElement("button");
+
+        btn.className = "option";
+        btn.textContent = option;
+
+        btn.onclick = () => {
+
+            document.querySelectorAll(".option")
+            .forEach(o => o.classList.remove("selected"));
+
+            btn.classList.add("selected");
+
+            selectedAnswer = option;
+
+            nextBtn.disabled = false;
+        };
+
+        answersEl.appendChild(btn);
+    });
+
+}
+
+nextBtn.addEventListener("click", () => {
+
+    const q = questions[currentQuestion];
+
+    if(selectedAnswer === q.answer){
+        score++;
+    }else{
+        wrongAnswers.push({
+            question:q.question,
+            selected:selectedAnswer,
+            correct:q.answer
+        });
+    }
+
+    currentQuestion++;
+
+    if(currentQuestion < questions.length){
+
+        nextBtn.disabled = true;
+
+        loadQuestion();
+
+    }else{
+
+        showResults();
+    }
+
+});
+
+function showResults(){
+
+    document.getElementById("quizSection").style.display = "none";
+
+    document.getElementById("resultSection").style.display = "block";
+
+    const percentage =
+    Math.round((score / questions.length) * 100);
+
+    document.getElementById("score").innerHTML =
+    `Score: ${score} / ${questions.length} (${percentage}%)`;
+
+    let html = "";
+
+    if(wrongAnswers.length > 0){
+
+        html += "<h3>Review Incorrect Answers</h3>";
+
+        wrongAnswers.forEach(item => {
+
+            html += `
+                <div class="review-item">
+                    <p><strong>Question:</strong> ${item.question}</p>
+                    <p class="wrong">Your Answer: ${item.selected}</p>
+                    <p class="correct">Correct Answer: ${item.correct}</p>
+                </div>
+            `;
+        });
+
+    }else{
+
+        html += "<h2 class='correct'>🎉 Perfect Score! 🎉</h2>";
+
+    }
+
+    document.getElementById("reviewArea").innerHTML = html;
+}
+
+</script>
+
+</body>
+</html>
